@@ -1,10 +1,12 @@
 [![](https://img.shields.io/nuget/v/soenneker.granola.openapiclientutil.svg?style=for-the-badge)](https://www.nuget.org/packages/soenneker.granola.openapiclientutil/)
+[![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.granola.openapiclientutil/build-and-test.yml?style=for-the-badge)](https://github.com/soenneker/soenneker.granola.openapiclientutil/actions/workflows/build-and-test.yml)
 [![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.granola.openapiclientutil/publish-package.yml?style=for-the-badge)](https://github.com/soenneker/soenneker.granola.openapiclientutil/actions/workflows/publish-package.yml)
 [![](https://img.shields.io/nuget/dt/soenneker.granola.openapiclientutil.svg?style=for-the-badge)](https://www.nuget.org/packages/soenneker.granola.openapiclientutil/)
+[![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.granola.openapiclientutil/codeql.yml?label=CodeQL&style=for-the-badge)](https://github.com/soenneker/soenneker.granola.openapiclientutil/actions/workflows/codeql.yml)
 
 # Soenneker.Granola.OpenApiClientUtil
 
-Exposes a cached OpenAPI client instance.
+Provides a lazily created Granola Kiota client over the shared Granola `HttpClient`.
 
 ## Install
 
@@ -12,33 +14,60 @@ Exposes a cached OpenAPI client instance.
 dotnet add package Soenneker.Granola.OpenApiClientUtil
 ```
 
-## Quick start
+## Configuration
+
+```json
+{
+  "Granola": {
+    "ApiKey": "<API key>",
+    "ClientBaseUrl": "https://public-api.granola.ai",
+    "AuthHeaderName": "Authorization",
+    "AuthHeaderValueTemplate": "Bearer {token}"
+  }
+}
+```
+
+Only `ApiKey` is required. The remaining values show their defaults.
+
+## Register
 
 ```csharp
 using Soenneker.Granola.OpenApiClientUtil.Registrars;
 using Microsoft.Extensions.DependencyInjection;
 
-var services = new ServiceCollection();
-var result = services.AddGranolaOpenApiClientUtilAsSingleton();
+services.AddGranolaOpenApiClientUtilAsScoped();
 ```
 
-Adds `GranolaOpenApiClientUtil` as a singleton service.
+This deliberately registers `IGranolaOpenApiClientUtil` as scoped while registering `IGranolaOpenApiHttpClient` as singleton. Disposing a scope releases that utility's generated-client wrapper without tearing down the long-lived HTTP client used by later scopes.
 
-## What you get
+Use `AddGranolaOpenApiClientUtilAsSingleton()` only when the generated-client wrapper itself should also live for the application lifetime.
 
-- `IGranolaOpenApiClientUtil` — Exposes a cached OpenAPI client instance.
-- `GranolaOpenApiClientUtilRegistrar` — Registers the OpenAPI client utility for dependency injection.
+## Usage
+
+```csharp
+GranolaOpenApiClient client = await clientUtil.Get(cancellationToken);
+
+ListNotesOutput? page = await client.V1.Notes.GetAsync(config =>
+{
+    config.QueryParameters.PageSize = 50;
+    config.QueryParameters.Cursor = cursor;
+}, cancellationToken);
+
+Note? note = await client.V1.Notes[noteId].GetAsync(
+    cancellationToken: cancellationToken);
+```
+
+Within one utility instance, repeated and concurrent `Get()` calls reuse the same lazily initialized generated client.
 
 ## API at a glance
 
 | API | What it does | Result / important behavior |
 | --- | --- | --- |
-| `IGranolaOpenApiClientUtil.Get(cancellationToken)` | Gets the shared generated client used to call the Granola API. | The cached generated client; repeated calls reuse the same instance until this service is disposed. |
-| `GranolaOpenApiClientUtilRegistrar.AddGranolaOpenApiClientUtilAsSingleton(services)` | Adds `GranolaOpenApiClientUtil` as a singleton service. | Returns `IServiceCollection`. |
-| `GranolaOpenApiClientUtilRegistrar.AddGranolaOpenApiClientUtilAsScoped(services)` | Adds `GranolaOpenApiClientUtil` as a scoped service. | Returns `IServiceCollection`. |
+| `Get(cancellationToken)` | Gets or creates the generated client. | Cached for the utility lifetime. |
+| `AddGranolaOpenApiClientUtilAsScoped()` | Registers a utility per scope over the singleton HTTP client. | Recommended for scoped consumers. |
+| `AddGranolaOpenApiClientUtilAsSingleton()` | Registers both layers for the application lifetime. | Reuses one generated client everywhere. |
 
 ## Practical notes
 
-- Cancellation stops pending work; it does not undo work that has already completed.
-- Reuse the registered client instead of constructing one per operation.
-- Dispose instances you own when their scope ends so held resources can be released.
+- Cancellation can stop first-time client initialization and is forwarded separately to generated request methods.
+- Let the DI container dispose the utility. Do not dispose the shared `HttpClient` obtained by the lower-level package.
