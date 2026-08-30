@@ -43,9 +43,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Soenneker.Kiota.GenericAuthenticationProvider" Version="4.0.38" />
-        <!--<PackageReference Include="Soenneker.Granola.HttpClients" Version="4.0.1" />
-        <PackageReference Include="Soenneker.Granola.OpenApiClient" Version="4.0.2" />-->
-        <PackageReference Include="Soenneker.Utils.AsyncSingleton" Version="4.0.821" />
+        <PackageReference Include="Soenneker.Kiota.GenericAuthenticationProvider" Version="4.0.41" />
+        <PackageReference Include="Soenneker.Granola.HttpClients" Version="4.0.4" />
+        <PackageReference Include="Soenneker.Granola.OpenApiClient" Version="4.0.3" />
+        <PackageReference Include="Soenneker.Utils.AsyncSingleton" Version="4.0.826" />
     </ItemGroup>
 </Project>
