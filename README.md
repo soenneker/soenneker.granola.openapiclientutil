@@ -59,6 +59,8 @@ Note? note = await client.V1.Notes[noteId].GetAsync(
 
 Within one utility instance, repeated and concurrent `Get()` calls reuse the same lazily initialized generated client.
 
+Authentication is supplied by the underlying HTTP provider, so the Kiota adapter does not add a second authorization header.
+
 ## API at a glance
 
 | API | What it does | Result / important behavior |

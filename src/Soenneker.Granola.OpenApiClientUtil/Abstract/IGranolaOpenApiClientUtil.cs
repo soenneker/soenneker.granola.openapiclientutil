@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Soenneker.Granola.OpenApiClientUtil.Abstract;
 
 /// <summary>
-/// Exposes a cached OpenAPI client instance.
+/// Provides a cached Granola OpenAPI client backed by the shared authenticated HTTP provider.
 /// </summary>
 public interface IGranolaOpenApiClientUtil : IDisposable, IAsyncDisposable
 {
