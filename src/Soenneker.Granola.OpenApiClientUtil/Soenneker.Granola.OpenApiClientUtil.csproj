@@ -44,7 +44,7 @@
 
     <ItemGroup>
         <PackageReference Include="Soenneker.Granola.HttpClients" Version="4.0.9" />
-        <PackageReference Include="Soenneker.Granola.OpenApiClient" Version="4.0.5" />
-        <PackageReference Include="Soenneker.Utils.AsyncSingleton" Version="4.0.830" />
+        <PackageReference Include="Soenneker.Granola.OpenApiClient" Version="4.0.6" />
+        <PackageReference Include="Soenneker.Utils.AsyncSingleton" Version="4.0.831" />
     </ItemGroup>
 </Project>
