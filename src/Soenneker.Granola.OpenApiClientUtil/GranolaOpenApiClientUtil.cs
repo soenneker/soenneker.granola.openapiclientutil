@@ -11,6 +11,7 @@ using Soenneker.Utils.AsyncSingleton;
 
 namespace Soenneker.Granola.OpenApiClientUtil;
 
+/// <inheritdoc cref="IGranolaOpenApiClientUtil" />
 public sealed class GranolaOpenApiClientUtil : IGranolaOpenApiClientUtil
 {
     private readonly AsyncSingleton<GranolaOpenApiClient> _client;
