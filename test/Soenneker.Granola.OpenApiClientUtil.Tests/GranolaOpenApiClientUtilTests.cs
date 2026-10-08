@@ -5,6 +5,7 @@ using Soenneker.Granola.HttpClients.Abstract;
 using Soenneker.Granola.OpenApiClientUtil.Abstract;
 using Soenneker.Granola.OpenApiClientUtil.Registrars;
 using Soenneker.Tests.HostedUnit;
+using System.Threading;
 
 namespace Soenneker.Granola.OpenApiClientUtil.Tests;
 
@@ -25,7 +26,7 @@ public sealed class GranolaOpenApiClientUtilTests : HostedUnitTest
     }
 
     [Test]
-    public async ValueTask Scoped_utility_keeps_http_client_singleton()
+    public async ValueTask Scoped_utility_keeps_http_client_singleton(CancellationToken cancellationToken)
     {
         var services = new ServiceCollection();
 
