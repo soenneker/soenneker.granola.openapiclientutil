@@ -47,6 +47,6 @@
 
     <ItemGroup>
         <PackageReference Include="Soenneker.Granola.HttpClients" Version="11.0.70" />
-        <PackageReference Include="Soenneker.Granola.OpenApiClient" Version="11.0.40" />
+        <PackageReference Include="Soenneker.Granola.OpenApiClient" Version="11.0.41" />
     </ItemGroup>
 </Project>
